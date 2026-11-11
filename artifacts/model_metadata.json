@@ -1,0 +1,14 @@
+{
+    "resume_classifier": "Tuned Linear SVM",
+    "model_a": "Logistic Regression (Resume + Name)",
+    "model_b": "Logistic Regression (Resume Only)",
+    "model_a_features": [
+        "Resume Text",
+        "Applicant Name"
+    ],
+    "model_b_features": [
+        "Resume Text"
+    ],
+    "preprocessing": "clean_resume()",
+    "sklearn_version": "1.8.0"
+}
