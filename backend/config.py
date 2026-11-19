@@ -1,6 +1,6 @@
 import os
 from pathlib import Path
-from typing import List
+from typing import List, Union
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 # Base directory for backend/
@@ -35,14 +35,31 @@ class Settings(BaseSettings):
     # Dataset path for bias audit (auto-resolves either ./resumes_dataset.jsonl or ../resumes_dataset.jsonl)
     DATASET_PATH: str = resolve_path("resumes_dataset.jsonl")
     
-    # Allowed CORS origins (e.g. React + Vite default http://localhost:5173)
-    CORS_ORIGINS: List[str] = [
+    # Allowed CORS origins (can be list or comma-separated string)
+    CORS_ORIGINS: Union[str, List[str]] = [
         "http://localhost:5173",
         "http://127.0.0.1:5173",
         "http://localhost:3000",
         "http://127.0.0.1:3000",
+        "https://ethics-ai.vercel.app",
+        "https://fairhire.vercel.app",
+        "https://fair-hire.vercel.app",
         "*"
     ]
+    
+    # Regex to match any Vercel preview or production deployment domain or localhost
+    CORS_ORIGIN_REGEX: str = r"https://.*\.vercel\.app|https?://localhost:\d+|https?://127\.0\.0\.1:\d+"
+    
+    def get_cors_origins(self) -> List[str]:
+        raw = self.CORS_ORIGINS
+        if isinstance(raw, list):
+            return raw
+        if isinstance(raw, str):
+            clean = raw.strip()
+            if not clean or clean == "*":
+                return ["*"]
+            return [x.strip() for x in clean.split(",") if x.strip()]
+        return ["*"]
     
     # Maximum file upload size in bytes (e.g. 5MB)
     MAX_UPLOAD_SIZE_BYTES: int = 5 * 1024 * 1024
